@@ -1,0 +1,12 @@
+easyocr==1.7.2
+Flask==3.1.2
+numpy==2.4.1
+opencv_contrib_python==4.11.0.86
+opencv_python==4.10.0.84
+opencv_python_headless==4.12.0.88
+pathfinding==1.0.17
+Pillow==12.1.0
+#streamlit==1.47.0
+#torch==2.5.1+cu124
+ultralytics==8.3.179
+google-genai
