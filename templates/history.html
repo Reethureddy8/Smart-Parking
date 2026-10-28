@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="md:flex md:items-center md:justify-between">
+        <div class="min-w-0 flex-1">
+            <h1 class="text-3xl font-bold leading-7 text-white sm:truncate sm:text-3xl sm:tracking-tight">Parking
+                History</h1>
+            <p class="mt-2 text-slate-400">Historical records of completed parking sessions</p>
+        </div>
+        <div class="mt-4 flex md:ml-4 md:mt-0">
+            <a href="{{ url_for('active_parking') }}"
+                class="inline-flex items-center rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-slate-700 hover:bg-slate-700 transition-all">
+                <i class="fa-solid fa-square-parking mr-2 text-slate-400"></i> View Active
+            </a>
+        </div>
+    </div>
+
+    {% if records %}
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+            class="overflow-hidden rounded-2xl bg-slate-800 shadow-lg border border-slate-700 relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <div class="p-6 relative z-10">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="p-3 bg-purple-500/10 rounded-xl text-purple-400 ring-1 ring-purple-500/20">
+                            <i class="fa-solid fa-list-check text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="truncate text-xs font-bold uppercase tracking-wider text-slate-500">Total Records
+                            </dt>
+                            <dd class="text-3xl font-bold text-white mt-1">{{ records|length }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="overflow-hidden rounded-2xl bg-slate-800 shadow-lg border border-slate-700 relative overflow-hidden group">
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+            <div class="p-6 relative z-10">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="p-3 bg-green-500/10 rounded-xl text-green-400 ring-1 ring-green-500/20">
+                            <i class="fa-solid fa-dollar-sign text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="truncate text-xs font-bold uppercase tracking-wider text-slate-500">Total Revenue
+                            </dt>
+                            <dd class="text-3xl font-bold text-white mt-1">${{ total_revenue }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-700">
+                <thead class="bg-slate-900/50">
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            License Plate</th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Slot
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Time
+                            Info</th>
+                        <th scope="col"
+                            class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            Duration</th>
+                        <th scope="col"
+                            class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Fare
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700 bg-slate-800">
+                    {% for record in records %}
+                    <tr class="hover:bg-slate-700/50 transition-colors group">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <span
+                                    class="bg-slate-900/50 text-white font-mono font-bold px-3 py-1.5 rounded-lg border border-slate-600 shadow-sm group-hover:border-slate-500 transition-colors">
+                                    {{ record.license_plate }}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-slate-300 font-medium">#{{ record.slot_number }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex flex-col text-sm">
+                                <span class="text-slate-200"><i
+                                        class="fa-solid fa-arrow-right-to-bracket w-4 text-green-500 mr-2"></i> {{
+                                    record.entry_time.split('.')[0] }}</span>
+                                <span class="text-slate-500 mt-1"><i
+                                        class="fa-solid fa-arrow-right-from-bracket w-4 text-red-500 mr-2"></i> {{
+                                    record.exit_time.split('.')[0] }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span
+                                class="inline-flex items-center rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-500/20">
+                                {{ record.duration_hours }}h {{ record.duration_minutes }}m
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-white">
+                            ${{ "%.2f"|format(record.fare) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span
+                                class="inline-flex items-center rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-500/20">
+                                Paid
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-24 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700">
+        <div
+            class="w-16 h-16 bg-slate-800 text-slate-600 rounded-full flex items-center justify-center mx-auto mb-4 ring-1 ring-slate-700">
+            <i class="fa-solid fa-clipboard-list text-3xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-1">No History Records</h3>
+        <p class="text-slate-500">No completed parking sessions found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

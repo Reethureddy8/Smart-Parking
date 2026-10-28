@@ -16,7 +16,7 @@ from ultralytics import YOLO
 import re
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-this-in-production'
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'dev-only-change-me')
 
 # Configuration
 UPLOAD_FOLDER = 'static/uploads'
@@ -658,7 +658,7 @@ def chat():
     data = request.get_json()
     user_input = data.get('message', '')
     
-    api_key = "AIzaSyBqX2pW2pW2pW2pW2pW2pW2pW2pW2pW2pW"
+    api_key = os.environ.get('GEMINI_API_KEY')
     if not api_key:
         return jsonify({'error': 'GEMINI_API_KEY not set on server'})
 

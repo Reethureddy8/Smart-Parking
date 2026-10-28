@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Parking System{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#1f2937',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        primary: {
+                            500: '#0ea5e9', // Sky 500
+                            600: '#0284c7', // Sky 600
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-scroll::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .text-pre-wrap {
+            white-space: pre-wrap;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="h-full font-sans antialiased text-slate-100 bg-slate-900 selection:bg-primary-500 selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center gap-3">
+                        <div
+                            class="bg-gradient-to-tr from-primary-600 to-indigo-600 text-white p-2 rounded-xl shadow-lg shadow-primary-500/20">
+                            <i class="fa-solid fa-square-parking text-xl"></i>
+                        </div>
+                        <span class="font-bold text-xl tracking-tight text-white">SmartPark <span
+                                class="text-primary-500">AI</span></span>
+                    </div>
+
+                    <!-- Desktop Menu -->
+                    <div class="hidden sm:ml-10 sm:flex sm:space-x-8">
+                        <a href="{{ url_for('index') }}"
+                            class="{% if request.endpoint == 'index' %}border-primary-500 text-white{% else %}border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-200{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200">
+                            Dashboard
+                        </a>
+                        <a href="{{ url_for('vehicle_entry') }}"
+                            class="{% if request.endpoint == 'vehicle_entry' %}border-primary-500 text-white{% else %}border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-200{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200">
+                            Vehicle Entry
+                        </a>
+                        <a href="{{ url_for('active_parking') }}"
+                            class="{% if request.endpoint == 'active_parking' %}border-primary-500 text-white{% else %}border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-200{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200">
+                            Active Parking
+                        </a>
+                        <a href="{{ url_for('history') }}"
+                            class="{% if request.endpoint == 'history' %}border-primary-500 text-white{% else %}border-transparent text-slate-400 hover:border-slate-700 hover:text-slate-200{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200">
+                            History
+                        </a>
+                    </div>
+                </div>
+
+                <!-- User Menu -->
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <div class="ml-3 relative">
+                        <a href="{{ url_for('logout') }}"
+                            class="inline-flex items-center px-4 py-2 border border-slate-700 rounded-lg text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="mb-8 space-y-4">
+                {% for category, message in messages %}
+                <div
+                    class="rounded-lg p-4 {% if category == 'success' %}bg-green-500/10 border border-green-500/20 text-green-400{% elif category == 'error' %}bg-red-500/10 border border-red-500/20 text-red-400{% else %}bg-blue-500/10 border border-blue-500/20 text-blue-400{% endif %} flex items-center justify-between shadow-lg backdrop-blur-sm animate-fade-in-down">
+                    <div class="flex items-center">
+                        <i
+                            class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'error' %}fa-circle-exclamation{% else %}fa-circle-info{% endif %} mr-3 text-lg"></i>
+                        <p class="font-medium">{{ message }}</p>
+                    </div>
+                    <button onclick="this.parentElement.remove()"
+                        class="text-sm font-medium hover:opacity-75 focus:outline-none opacity-60 hover:opacity-100 transition-opacity">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-slate-500">
+                &copy;
+                <script>document.write(new Date().getFullYear())</script> Smart Parking System. <span
+                    class="text-slate-400">Powered by Advanced AI</span>
+            </p>
+        </div>
+    </footer>
+
+
+    <!-- Chatbot Widget -->
+    <div id="chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <!-- Chat Window (Hidden by default) -->
+        <div id="chat-window"
+            class="hidden mb-4 w-96 h-[500px] bg-slate-800/95 backdrop-blur-xl border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right transform scale-95 opacity-0">
+            <!-- Header -->
+            <div
+                class="bg-gradient-to-r from-primary-600 to-indigo-600 p-4 flex justify-between items-center shadow-md shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-robot text-white text-lg"></i>
+                    <h3 class="font-bold text-white">AI Assistant</h3>
+                </div>
+                <button onclick="toggleChat()" class="text-white/80 hover:text-white transition-colors">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto chat-scroll space-y-4 bg-slate-800/50">
+                <!-- Welcome Message -->
+                <div class="flex items-start gap-2.5">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center shrink-0 border border-primary-500/30">
+                        <i class="fa-solid fa-robot text-sm"></i>
+                    </div>
+                    <div
+                        class="bg-slate-700/50 text-slate-200 p-3 rounded-2xl rounded-tl-none border border-slate-600/50 text-sm shadow-sm">
+                        Hello! I'm your Smart Parking AI assistant. How can I help you today?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="p-3 bg-slate-900/50 border-t border-slate-700 shrink-0">
+                <form id="chat-form" onsubmit="sendMessage(event)" class="relative">
+                    <input type="text" id="chat-input" placeholder="Ask about parking, rates..."
+                        class="w-full bg-slate-800 border border-slate-600 text-white rounded-xl pl-4 pr-12 py-3 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all placeholder-slate-500 text-sm shadow-inner">
+                    <button type="submit" id="send-btn"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary-500 hover:text-primary-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Floating Button -->
+        <button onclick="toggleChat()"
+            class="group flex items-center justify-center w-14 h-14 bg-gradient-to-r from-primary-600 to-indigo-600 rounded-full shadow-lg shadow-primary-500/30 hover:scale-110 transition-all duration-300 focus:outline-none ring-offset-2 ring-offset-slate-900 focus:ring-2 focus:ring-primary-500">
+            <i class="fa-solid fa-message text-white text-xl group-hover:animate-pulse"></i>
+        </button>
+    </div>
+
+    <!-- Global Scripts -->
+    <script>
+        function toggleChat() {
+            const window = document.getElementById('chat-window');
+            const messages = document.getElementById('chat-messages');
+
+            if (window.classList.contains('hidden')) {
+                window.classList.remove('hidden');
+                // Small delay to allow display:block to apply before opacity transition
+                setTimeout(() => {
+                    window.classList.remove('scale-95', 'opacity-0');
+                    // Scroll to bottom
+                    messages.scrollTop = messages.scrollHeight;
+                    document.getElementById('chat-input').focus();
+                }, 10);
+            } else {
+                window.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    window.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        async function sendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const messages = document.getElementById('chat-messages');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            appendMessage('user', message);
+            input.value = '';
+            input.disabled = true;
+            sendBtn.disabled = true;
+
+            // Add AI thinking placeholder
+            const aiMsgId = appendMessage('ai', '', true);
+            const aiMsgContent = document.getElementById(aiMsgId).querySelector('.message-content');
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                if (!response.ok) throw new Error('Network error');
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                aiMsgContent.innerHTML = ''; // Clear thinking dot
+                let fullText = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    fullText += chunk;
+                    // convert newlines to <br> for basic formatting
+                    aiMsgContent.innerHTML = fullText.replace(/\n/g, '<br>');
+                    messages.scrollTop = messages.scrollHeight;
+                }
+
+            } catch (error) {
+                aiMsgContent.innerHTML = '<span class="text-red-400">Sorry, I encountered an error. Please try again.</span>';
+                console.error('Chat error:', error);
+            } finally {
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        function appendMessage(role, text, isThinking = false) {
+            const messages = document.getElementById('chat-messages');
+            const id = 'msg-' + Date.now();
+
+            const align = role === 'user' ? 'justify-end' : 'justify-start';
+            const bgColor = role === 'user' ? 'bg-primary-600 text-white' : 'bg-slate-700/50 text-slate-200 border border-slate-600/50';
+            const icon = role === 'ai' ? `
+                <div class="w-8 h-8 rounded-full bg-primary-500/20 text-primary-400 flex items-center justify-center shrink-0 border border-primary-500/30">
+                    <i class="fa-solid fa-robot text-sm"></i>
+                </div>` : '';
+
+            const content = isThinking ?
+                '<span class="animate-pulse">Thinking...</span>' :
+                text.replace(/\n/g, '<br>');
+
+            const html = `
+                <div id="${id}" class="flex items-start gap-2.5 ${role === 'user' ? 'flex-row-reverse' : ''}">
+                    ${icon}
+                    <div class="${bgColor} p-3 rounded-2xl ${role === 'user' ? 'rounded-tr-none' : 'rounded-tl-none'} text-sm shadow-sm max-w-[80%] message-content">
+                        ${content}
+                    </div>
+                </div>
+            `;
+
+            messages.insertAdjacentHTML('beforeend', html);
+            messages.scrollTop = messages.scrollHeight;
+            return id;
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
