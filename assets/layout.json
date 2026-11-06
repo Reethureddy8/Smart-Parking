@@ -1,0 +1,202 @@
+{
+ "orientation": "tall",
+ "slots": [
+  {
+   "row": 0,
+   "col": 0,
+   "x1": 0.0147,
+   "y1": 0.1482,
+   "x2": 0.1206,
+   "y2": 0.4848,
+   "seen": "car",
+   "conf": 0.658,
+   "inferred": false,
+   "label": "A1"
+  },
+  {
+   "row": 0,
+   "col": 1,
+   "x1": 0.1261,
+   "y1": 0.1482,
+   "x2": 0.2554,
+   "y2": 0.4848,
+   "seen": "car",
+   "conf": 0.509,
+   "inferred": false,
+   "label": "A2"
+  },
+  {
+   "row": 0,
+   "col": 2,
+   "x1": 0.2765,
+   "y1": 0.1482,
+   "x2": 0.3907,
+   "y2": 0.4848,
+   "seen": "empty",
+   "conf": 0.81,
+   "inferred": false,
+   "label": "A3"
+  },
+  {
+   "row": 0,
+   "col": 3,
+   "x1": 0.4087,
+   "y1": 0.1482,
+   "x2": 0.5105,
+   "y2": 0.4848,
+   "seen": "empty",
+   "conf": 0.805,
+   "inferred": false,
+   "label": "A4"
+  },
+  {
+   "row": 0,
+   "col": 4,
+   "x1": 0.5258,
+   "y1": 0.1482,
+   "x2": 0.6382,
+   "y2": 0.4848,
+   "seen": "empty",
+   "conf": 0.805,
+   "inferred": false,
+   "label": "A5"
+  },
+  {
+   "row": 0,
+   "col": 5,
+   "x1": 0.654,
+   "y1": 0.1482,
+   "x2": 0.7582,
+   "y2": 0.4848,
+   "seen": "car",
+   "conf": 0.8,
+   "inferred": false,
+   "label": "A6"
+  },
+  {
+   "row": 0,
+   "col": 6,
+   "x1": 0.7684,
+   "y1": 0.1482,
+   "x2": 0.8713,
+   "y2": 0.4848,
+   "seen": "empty",
+   "conf": 0.835,
+   "inferred": false,
+   "label": "A7"
+  },
+  {
+   "row": 0,
+   "col": 7,
+   "x1": 0.8825,
+   "y1": 0.1482,
+   "x2": 0.9909,
+   "y2": 0.4848,
+   "seen": "empty",
+   "conf": 0.699,
+   "inferred": false,
+   "label": "A8"
+  },
+  {
+   "row": 1,
+   "col": 0,
+   "x1": 0.039,
+   "y1": 0.513,
+   "x2": 0.1332,
+   "y2": 0.8678,
+   "seen": "empty",
+   "conf": 0.741,
+   "inferred": false,
+   "label": "B1"
+  },
+  {
+   "row": 1,
+   "col": 1,
+   "x1": 0.1261,
+   "y1": 0.513,
+   "x2": 0.2554,
+   "y2": 0.8678,
+   "seen": "car",
+   "conf": 0.509,
+   "inferred": false,
+   "label": "B2"
+  },
+  {
+   "row": 1,
+   "col": 2,
+   "x1": 0.2769,
+   "y1": 0.513,
+   "x2": 0.3942,
+   "y2": 0.8678,
+   "seen": "empty",
+   "conf": 0.807,
+   "inferred": false,
+   "label": "B3"
+  },
+  {
+   "row": 1,
+   "col": 3,
+   "x1": 0.3937,
+   "y1": 0.513,
+   "x2": 0.4896,
+   "y2": 0.8678,
+   "seen": "car",
+   "conf": 0.787,
+   "inferred": false,
+   "label": "B4"
+  },
+  {
+   "row": 1,
+   "col": 4,
+   "x1": 0.5277,
+   "y1": 0.513,
+   "x2": 0.6315,
+   "y2": 0.8678,
+   "seen": "car",
+   "conf": 0.81,
+   "inferred": false,
+   "label": "B5"
+  },
+  {
+   "row": 1,
+   "col": 5,
+   "x1": 0.6439,
+   "y1": 0.513,
+   "x2": 0.7585,
+   "y2": 0.8678,
+   "seen": "empty",
+   "conf": 0.844,
+   "inferred": false,
+   "label": "B6"
+  },
+  {
+   "row": 1,
+   "col": 6,
+   "x1": 0.7563,
+   "y1": 0.513,
+   "x2": 0.8982,
+   "y2": 0.8678,
+   "seen": "car",
+   "conf": 0.692,
+   "inferred": false,
+   "label": "B7"
+  },
+  {
+   "row": 1,
+   "col": 7,
+   "x1": 0.8977,
+   "y1": 0.513,
+   "x2": 1.0,
+   "y2": 0.8678,
+   "seen": "car",
+   "conf": 0.793,
+   "inferred": false,
+   "label": "B8"
+  }
+ ],
+ "lot_image": {
+  "src": "asset:lot.jpg",
+  "w": 832,
+  "h": 832
+ }
+}

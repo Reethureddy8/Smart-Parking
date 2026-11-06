@@ -1,95 +1,68 @@
-# SmartPark AI – Smart Parking System
+# SmartPark
 
-An AI-powered parking management web app. It reads vehicle number plates from a webcam or an uploaded photo, assigns a free parking slot, tracks parking time and fares, and has a built-in Gemini chat assistant.
+Parking operations console. The entry camera reads number plates, each car is sent to the nearest suitable bay with a drawn route, an overhead lot camera spots cars without a ticket, and exits are charged by tariff with UPI QR, cash or card.
 
-## Features
+## Run it
 
-- **Automatic vehicle entry**: capture a vehicle with the webcam or upload an image. A YOLOv8 model finds the number plate and EasyOCR reads it.
-- **Slot assignment and map**: the nearest free slot is assigned and highlighted on a parking-lot map (driver copy).
-- **Active parking dashboard**: see parked vehicles, their slots, and live duration and fare.
-- **Exit and payment**: the fare is calculated from parking time, with a QR code for payment.
-- **History**: past sessions and total revenue.
-- **User accounts**: register and log in.
-- **AI assistant**: a chat widget powered by Google Gemini that answers questions about the system.
+Double-click **`Start SmartPark.bat`** (Windows). It installs dependencies on the first run, starts the server and opens the browser.
 
-## Tech stack
-
-| Layer | Tools |
-|-------|-------|
-| Backend | Python, Flask, SQLite |
-| Computer vision | Ultralytics YOLOv8, EasyOCR, OpenCV, Pillow, NumPy |
-| AI assistant | Google Gemini (`google-genai`) |
-| Frontend | HTML (Jinja2 templates), Tailwind CSS, JavaScript |
-
-## Project structure
-
-```
-Smart-Parking/
-├── flask_app.py          # Flask app: routes, detection, database, chat
-├── best.pt               # Trained YOLOv8 weights for plate detection
-├── requirements.txt
-├── run_flask_app.bat     # Windows: install dependencies and start the server
-├── Open website.bat      # Windows: start the server and open the browser
-├── templates/            # Jinja2 HTML pages
-├── static/
-│   ├── css/  js/         # Styles and front-end scripts
-│   ├── parking_lot.jpg   # Parking-lot map image
-│   └── uploads/          # Captured images (created at runtime, not committed)
-├── 11.jpeg, 12.jpeg      # Sample vehicle images for testing
-├── .env.example
-└── LICENSE
-```
-
-## Getting started
-
-### 1. Prerequisites
-
-- Python 3.10+
-- A webcam (optional, you can upload images instead)
-- A Google Gemini API key (optional, only needed for the chat assistant)
-
-### 2. Install
+Or manually:
 
 ```bash
-git clone https://github.com/Reethureddy8/Smart-Parking.git
-cd Smart-Parking
-python -m venv venv
-# Windows: venv\Scripts\activate    macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
+python run.py --open        # http://127.0.0.1:5000
 ```
 
-### 3. Set environment variables
+On first launch you create the admin account. The models take about 10 s to load in the background. Until they're ready you can still type plates.
 
-See `.env.example` for the variables the app uses.
+## What it does
 
-```bash
-# macOS / Linux
-export FLASK_SECRET_KEY="any-long-random-string"
-export GEMINI_API_KEY="your-gemini-api-key"
+| Area | Details |
+|---|---|
+| **Gate** | One screen for the whole job: type or scan a plate (or just its last 4 digits). A parked car comes up ready to check out; a new car comes up ready to check in with its bay chosen. `Enter` confirms, `Esc` clears. |
+| **Entry** | Webcam, photo upload, paste or typed entry. EasyOCR reads the plate. Look-alike characters (O/0, I/1, B/8…) are fixed by fitting Indian formats (`KA 01 AB 1234`, BH series, two-line plates). Ranked candidates show confidence. Duplicate plates are blocked. |
+| **Assignment** | Nearest free bay from the entrance by driving distance, matched to vehicle type (EV → EV bays, bikes → bike bays, accessible bays held back). The route is drawn on the lot map. Click any bay to override. |
+| **Lot camera** | `model/best.pt` (YOLO, classes Car/Empty) scans an overhead frame and marks which bays physically hold a vehicle. It flags **cars without a ticket** and **tickets whose bay looks empty** (drove off without paying). |
+| **Layout** | Bays are auto-mapped from a camera frame: rows are clustered, a van across two bays is split, and missed bays are inferred from even spacing. Admins can set bay types, close bays and move the entrance. |
+| **Exit** | Search by plate, last 4 digits, ticket code or a photo. Live fare with breakdown. Pay by UPI QR (with amount), cash or card. Admins can waive. Printable receipt. |
+| **Tariffs** | Per vehicle type: free grace minutes, first hour, each started hour, daily cap. |
+| **Dashboard** | Live via server-sent events: free bays, occupancy, revenue, money on the meter, alerts, activity feed, vehicles-per-hour and 7-day revenue charts. |
+| **Tickets** | Parked and history views, search, date filters, CSV export, move bay, void (admin), printable thermal-size tickets with QR. |
+| **Assistant** | Answers from live lot data ("where is KA01AB1234?", "how much for 3 hours?", "any alerts?"). Uses Gemini when `GEMINI_API_KEY` is set, and works offline without it. |
+| **Team** | Admin and operator roles, scrypt password hashing, login throttling, CSRF header check, HttpOnly session cookies. |
+
+Keyboard: `G` gate, `O` overview, `T` tickets, `L` lot. On the Gate you can just start typing a plate. `Enter` confirms, `Esc` clears, `Space` captures with the camera and `Ctrl+V` pastes a photo.
+
+## Try it without a camera
+
+- **Plates:** `assets/plates/*.jpg` (Gate → Photo).
+- **Lot camera:** the sample frames on the Lot camera page.
+
+## Configuration
+
+Copy `.env.example` to `.env`. Every setting is optional: `GEMINI_API_KEY`, `HOST` (use `0.0.0.0` so a phone at the gate can connect), `PORT`, and `SMARTPARK_DATA`. Lot name, UPI ID, currency and tariffs are set in the app under **Settings**.
+
+## Project layout
+
+```
+smartpark/        backend (FastAPI)
+  main.py         HTTP API, auth, SSE
+  services.py     tickets, assignment, fares, camera reconciliation, stats
+  layout.py       bay grid from detections, occupancy matching, routing
+  vision.py       YOLO + EasyOCR, loaded on a background thread
+  plates.py       plate cleaning / OCR correction / formatting
+  pricing.py      tariff maths
+  assistant.py    Gemini + offline answers
+web/              front end (vanilla JS, no build step, no CDN)
+model/best.pt     YOLO lot-occupancy weights
+assets/           lot image, bundled layout, sample frames and plates
+tools/            regenerate layout.json / sample plates
+tests/            pytest: core logic + API flows
+data/             SQLite DB and captured images (created at runtime)
 ```
 
-```powershell
-# Windows PowerShell
-$env:FLASK_SECRET_KEY="any-long-random-string"
-$env:GEMINI_API_KEY="your-gemini-api-key"
-```
-
-### 4. Run
-
-```bash
-python flask_app.py
-```
-
-Then open <http://localhost:5000>. On Windows you can also double-click `run_flask_app.bat` or `Open website.bat`.
-
-The first start can take a while because EasyOCR downloads its models.
-
-## Notes
-
-- `parking_system.db` (SQLite) is **created automatically** on first run. It is not included in the repo because it holds user data.
-- `best.pt` is the trained YOLOv8 weights file used for number-plate detection. Keep it in the project root.
-- Use `11.jpeg` and `12.jpeg` to test vehicle entry without a camera.
+Run the tests with `python -m pytest`.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+MIT, see `LICENSE`.

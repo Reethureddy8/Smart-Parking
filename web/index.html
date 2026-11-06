@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SmartPark</title>
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/app.css?v={{v}}">
+<script>
+  try { const t = localStorage.getItem('sp-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<div id="app" aria-live="polite"><div class="boot"><div class="boot-mark"></div></div></div>
+<div id="toasts" role="status" aria-live="polite"></div>
+<div id="print-area" aria-hidden="true"></div>
+<script src="/static/app.js?v={{v}}" defer></script>
+</body>
+</html>
